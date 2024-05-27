@@ -48,16 +48,20 @@ dotenv.config()
         const userId = req.params.userId
         try {
             const user = req.user
+
+            if(!user) {
+                return res.status(400).json({message: "user not found"})
+            }
+
             await Token.updateMany({ userId }, { $set: { isValid: false } })
 
-            const sentmail = await sendVerificationEmail(user?.email, user?._id, 5)
+            const sentmail = await sendVerificationEmail(user.email, user._id, 5)
 
             return res.send(200).json(sentmail)
             
         } catch (error) {
             console.error(error)
         }
-
     }
 
     export async function verify(req: Request, res: Response) {

@@ -1,4 +1,5 @@
 import { Document, Schema, Types } from "mongoose"
+import { User } from "../schema/userSchema"
 
 
 interface IBody {
@@ -19,6 +20,13 @@ interface IUser extends Document {
     createdAt?: Date,
     updatedAt?: Date
 }
+
+declare module 'express-serve-static-core' {
+    interface Request {
+        user?: IUser; // Adjust the type according to your User schema
+    }
+}
+
 
 interface IToken extends Document {
     userId: Schema.Types.ObjectId,
