@@ -1,12 +1,15 @@
-import { Request, Response } from "express"
+import { Request, Response, NextFunction } from "express"
 import { IBody, IUser } from "../interface/User"
 import bcrypt from "bcrypt"
 import dotenv from "dotenv"
-import { User } from "../schema/userSchema"
+import { User, Token } from "../schema/userSchema"
 import { sendEmail } from "../utils/emailTransporter"
 import { sendVerificationEmail } from "../utils/sendVerificationEmail"
+import { Types } from "mongoose"
 
 dotenv.config()
+
+
 
     export async function createAccount(req: Request, res: Response):Promise<void> {
         try {
@@ -39,6 +42,62 @@ dotenv.config()
             res.status(500).send(err)
         }
       
+    }
+
+    export async function generateToken(req: Request, res: Response) {
+        const userId = req.params.userId
+        try {
+            const user = req.user
+            await Token.updateMany({ userId }, { $set: { isValid: false } })
+
+            const sentmail = await sendVerificationEmail(user?.email, user?._id, 5)
+
+            return res.send(200).json(sentmail)
+            
+        } catch (error) {
+            console.error(error)
+        }
+
+    }
+
+    export async function verify(req: Request, res: Response) {
+        const {token, userId} = req.params
+        if (!(token && userId)) {
+            return res.status(401).json({message: "invalid credentials"})
+        }
+
+        const databaseToken = await Token.findOne({ userId, token })
+
+        if (!databaseToken) {
+            return res.status(404).json({message: "no token in database"})
+        }
+
+        if (!databaseToken.isValid) {
+            return res.status(401).json({message: "token has expired"})
+        }
+
+        // this is where i check the time and delete the token if the time has expired
+        const currentTime = Date.now()
+        const tokenCreationTime = databaseToken.createdAt?.getTime()
+
+        if(!tokenCreationTime) {
+           return res.status(400).json({message: "token has no set time"})
+        }
+
+        const timeDifferenceInSeconds = (currentTime - tokenCreationTime) / 1000;
+        
+        if((timeDifferenceInSeconds / 60) > 5) {
+            return res.status(404).json({message: "token has expired"})
+        }
+
+        // for security measure i still need to check if the user exists
+
+        const user = await User.find({_id: userId})
+
+        if(!user) {
+           
+        }
+       
     }
 
     export function login () {}

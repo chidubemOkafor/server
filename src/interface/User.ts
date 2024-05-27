@@ -15,12 +15,16 @@ interface IUser extends Document {
     email: string,
     password: string,
     isVerified: boolean,
-    isSubscribed: boolean
+    isSubscribed: boolean,
+    createdAt?: Date,
+    updatedAt?: Date
 }
 
 interface IToken extends Document {
     userId: Schema.Types.ObjectId,
     token: string,
+    createdAt?: Date,
+    isValid: boolean
 }
 
 interface VerifyUser extends IUser {

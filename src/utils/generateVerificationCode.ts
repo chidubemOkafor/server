@@ -3,7 +3,7 @@ import { Types } from 'mongoose';
 import { Token } from '../schema/userSchema';
 
 export const generateVerificationCodeAndSaveToDatabase = async(_id: Types.ObjectId, duration: number): Promise<string> => {
-    const verificationCode = randomstring.generate(8);
+    const verificationCode = randomstring.generate(6);
 
     const storeToken = new Token({
         userId: _id,

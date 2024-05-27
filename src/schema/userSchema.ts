@@ -29,6 +29,14 @@ const userSchema: Schema<IUser> = new Schema({
     isSubscribed: {
         type: Boolean,  
         default: false
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
+    updatedAt: {
+        type: Date,
+        default: Date.now
     }
 });
 
@@ -41,8 +49,15 @@ const tokenSchema: Schema<IToken> = new Schema({
     token: {
         type: String,
         required: true
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
+    isValid: {
+        type: Boolean,
+        default: true
     }
-
 })
 
 
