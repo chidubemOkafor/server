@@ -11,16 +11,23 @@ dotenv.config()
 
 
 
-    export async function createAccount(req: Request, res: Response):Promise<void> {
+    export async function createAccount(req: Request, res: Response) {
         try {
             const {username, email, password}: IBody = req.body
 
             const checkUser = await User.findOne({email})
-    
+
             if (checkUser) {
-                throw new Error("user already exist")
-            } 
-        
+                if (checkUser.username === username) {
+                    return res.status(400).json({message: "username exists"})
+                }
+                if(!checkUser.isVerified) {
+                    await User.deleteOne({email})
+                }
+
+                return res.status(400).json({message: "user with email already exists"})
+            }
+            
             const hashedPassword = await bcrypt.hash(password, parseInt(process.env.SALTROUNDS as string))
     
             const user = {
@@ -47,17 +54,17 @@ dotenv.config()
     export async function generateToken(req: Request, res: Response) {
         const userId = req.params.userId
         try {
-            const user = req.user
+            const user = req.user as IUser
 
-            if(!user) {
-                return res.status(400).json({message: "user not found"})
+            if(user.isVerified) {
+                return res.status(400).json({message: "user is already verified"})
             }
 
             await Token.updateMany({ userId }, { $set: { isValid: false } })
 
-            const sentmail = await sendVerificationEmail(user.email, user._id, 5)
+            await sendVerificationEmail(user.email, user._id, 5)
 
-            return res.send(200).json(sentmail)
+            return res.status(200).json({message: "verification code has been sent"})
             
         } catch (error) {
             console.error(error)
@@ -65,45 +72,51 @@ dotenv.config()
     }
 
     export async function verify(req: Request, res: Response) {
-        const {token, userId} = req.params
-        if (!(token && userId)) {
-            return res.status(401).json({message: "invalid credentials"})
+        const { token, userId } = req.params;
+
+        if (!(token || userId)) {
+            return res.status(401).json({ message: "incomplete credential" });
         }
+    
+        try {
+            const user = req.user as IUser;
 
-        const databaseToken = await Token.findOne({ userId, token })
+            const databaseToken = await Token.findOne({ userId, token });
+    
+            if (!databaseToken) {
+                return res.status(404).json({ message: "generate new token" });
+            }
+    
+            const currentTime = Date.now();
+            const tokenCreationTime = databaseToken.createdAt?.getTime();
+    
+            if (!tokenCreationTime) {
+                return res.status(400).json({ message: "Token has no set time" });
+            }
+    
+            const timeDifferenceInMinutes = (currentTime - tokenCreationTime) / (1000 * 60);
+    
+            if (timeDifferenceInMinutes > 5) {
+                await Token.deleteOne({ _id: databaseToken._id });
+                return res.status(401).json({ message: "Token has expired" });
+            }
+    
+            user.isVerified = true;
+            await user.save();
 
-        if (!databaseToken) {
-            return res.status(404).json({message: "no token in database"})
+            return res.status(200).json({ message: "User verified successfully" });
+    
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ message: "Internal server error" });
         }
-
-        if (!databaseToken.isValid) {
-            return res.status(401).json({message: "token has expired"})
-        }
-
-        // this is where i check the time and delete the token if the time has expired
-        const currentTime = Date.now()
-        const tokenCreationTime = databaseToken.createdAt?.getTime()
-
-        if(!tokenCreationTime) {
-           return res.status(400).json({message: "token has no set time"})
-        }
-
-        const timeDifferenceInSeconds = (currentTime - tokenCreationTime) / 1000;
-        
-        if((timeDifferenceInSeconds / 60) > 5) {
-            return res.status(404).json({message: "token has expired"})
-        }
-
-        // for security measure i still need to check if the user exists
-
-        const user = await User.find({_id: userId})
-
-        if(!user) {
-           
-        }
-       
     }
 
     export function login () {}
 
+
+
+    function clearTokens () {
+
+    }
 

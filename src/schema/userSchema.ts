@@ -53,10 +53,6 @@ const tokenSchema: Schema<IToken> = new Schema({
     createdAt: {
         type: Date,
         default: Date.now
-    },
-    isValid: {
-        type: Boolean,
-        default: true
     }
 })
 
