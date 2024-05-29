@@ -7,7 +7,7 @@ import MongoStore from "connect-mongo"
 import session from "express-session"
 import passport from "passport"
 import cookieParser from "cookie-parser"
-import "./strategies/local-strategy"
+import "./strategies/localStrategy"
 
 dotenv.config()
 const PORT = process.env.PORT

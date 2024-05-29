@@ -1,6 +1,6 @@
 import { createAccount, generateToken, verify, login } from "../controller/authentication"
 import express, { Request, Response } from "express"
-import "../strategies/local-strategy"
+import "../strategies/localStrategy"
 import passport from "passport"
 import { checkUser } from "../middleware/checkUser"
 
