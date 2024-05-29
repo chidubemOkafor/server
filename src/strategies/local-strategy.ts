@@ -1,8 +1,10 @@
 import passport from "passport";
 import { Strategy } from "passport-local";
-import User from "../schema/userSchema";
+import { User } from "../schema/userSchema";
+import { IUser } from "../interface/User";
 import "../connection"
 import bcrypt from 'bcrypt'
+import { Types } from "mongoose";
 
 export default passport.use(
     new Strategy({usernameField: "email"}, async (email, password, done) => {
@@ -27,12 +29,19 @@ export default passport.use(
     })
 )
 
-passport.serializeUser((user, done) => {
+passport.serializeUser((user: IUser, done) => {
     console.log("seriremail", user)
     done(null, user._id)
 })
 
 passport.deserializeUser(async (id, done) => {
-    const user = await User.findOne({_id: id})
-    done(null, user)
+    try {
+        const user = await User.findOne({_id: id})
+        if(!user) {
+            throw new Error("user not found")
+        }
+        done(null, user)
+    } catch (error) {
+        done(error, null)
+    } 
 })

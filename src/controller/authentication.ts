@@ -9,8 +9,6 @@ import { Types } from "mongoose"
 
 dotenv.config()
 
-
-
     export async function createAccount(req: Request, res: Response) {
         try {
             const {username, email, password}: IBody = req.body
@@ -18,14 +16,22 @@ dotenv.config()
             const checkUser = await User.findOne({email})
 
             if (checkUser) {
-                if (checkUser.username === username) {
-                    return res.status(400).json({message: "username exists"})
-                }
                 if(!checkUser.isVerified) {
                     await User.deleteOne({email})
-                }
+                } 
+                else {
+                    
+                    if (checkUser.username === username) {
+                        return res.status(400).json({message: "username exists"})
+                    }
 
-                return res.status(400).json({message: "user with email already exists"})
+                    if (checkUser.email === email) {
+                        return res.status(400).json({message: "user with email already exists"})
+                    }
+
+                }
+            
+                
             }
             
             const hashedPassword = await bcrypt.hash(password, parseInt(process.env.SALTROUNDS as string))
@@ -43,7 +49,7 @@ dotenv.config()
             sendVerificationEmail(newUserResult.email, newUserResult._id, 5)
              
             
-            res.status(200).json({message: `account created for ${newUserResult.username}`})
+            res.status(200).json({message: `verify account for ${newUserResult.username} to complete creation`})
         } catch (err) {
             console.log(err)
             res.status(500).send(err)
@@ -104,7 +110,7 @@ dotenv.config()
             user.isVerified = true;
             await user.save();
 
-            return res.status(200).json({ message: "User verified successfully" });
+            return res.status(200).json({ message: "account created successfully" });
     
         } catch (error) {
             console.error(error);
@@ -112,11 +118,6 @@ dotenv.config()
         }
     }
 
-    export function login () {}
+    export function login (req: Request, res: Response) {}
 
-
-
-    function clearTokens () {
-
-    }
 
