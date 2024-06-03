@@ -9,21 +9,22 @@ interface IBody {
 }
 
 interface IUser extends Document {
-    _id: Types.ObjectId,
+    _id?: Types.ObjectId,
     username: string,
     profile_picture?: string | null,
     tracking_anime?: Array<string> | null,
     email: string,
     password: string,
-    isVerified: boolean,
-    isSubscribed: boolean,
+    isSubscribed?: boolean,
     createdAt?: Date,
     updatedAt?: Date
 }
 
 interface IToken extends Document {
-    userId: Schema.Types.ObjectId,
     token: string,
+    encryptedToken: string,
+    email: string,
+    isExpired: boolean,
     createdAt?: Date,
     isValid: boolean
 }

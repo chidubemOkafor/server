@@ -10,11 +10,9 @@ export async function checkUser(
   try {
     const user = await User.findOne({ _id: userId });
 
-    if (!user) {
-      return res.status(404).json({ message: "user does not exist" });
+    if (user) {
+      return res.status(404).json({ message: "user already exist" });
     }
-
-    req.user = user;
  
     next();
   } catch(error) {

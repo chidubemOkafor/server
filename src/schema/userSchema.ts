@@ -22,10 +22,6 @@ const userSchema: Schema<IUser> = new Schema({
         type: String, 
         required: true 
     },
-    isVerified: {
-        type: Boolean, 
-        default: false
-    },
     isSubscribed: {
         type: Boolean,  
         default: false
@@ -41,12 +37,20 @@ const userSchema: Schema<IUser> = new Schema({
 });
 
 const tokenSchema: Schema<IToken> = new Schema({
-    userId: { 
-        type: Schema.Types.ObjectId,
-        ref: "User",
-        required: true,
-    },
     token: {
+        type: String,
+        required: true
+    },
+    encryptedToken: {
+        type: String,
+        required: true
+    },
+    isExpired: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
+    email: {
         type: String,
         required: true
     },

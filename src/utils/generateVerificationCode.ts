@@ -1,14 +1,17 @@
 import randomstring from 'randomstring';
-import { Types } from 'mongoose';
 import { Token } from '../schema/userSchema';
+import { IToken } from '../interface/User';
 
-export const generateVerificationCodeAndSaveToDatabase = async(_id: Types.ObjectId, duration: number): Promise<string> => {
+export const generateVerificationCodeAndSaveToDatabase = async(_to: string, _encriptedToken: string, duration: number): Promise<string> => {
     const verificationCode = randomstring.generate(6);
 
-    const storeToken = new Token({
-        userId: _id,
+    await Token.deleteMany({email: _to})
+
+    const storeToken: IToken = new Token({
         token: verificationCode,
-        duration: new Date(Date.now() + 300000)
+        encryptedToken: _encriptedToken,
+        email: _to,
+        duration: new Date(Date.now() + duration),
     })
 
     const storedToken = await storeToken.save()

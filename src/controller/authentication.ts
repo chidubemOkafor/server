@@ -1,55 +1,35 @@
 import { Request, Response, NextFunction } from "express"
-import { IBody, IUser } from "../interface/User"
+import { IBody, IUser, IToken } from "../interface/User"
 import bcrypt from "bcrypt"
 import dotenv from "dotenv"
 import { User, Token } from "../schema/userSchema"
 import { sendEmail } from "../utils/emailTransporter"
 import { sendVerificationEmail } from "../utils/sendVerificationEmail"
 import { Types } from "mongoose"
+import jwt from "jsonwebtoken"
 
 dotenv.config()
 
     export async function createAccount(req: Request, res: Response) {
         try {
-            const {username, email, password}: IBody = req.body
 
-            const checkUser = await User.findOne({email})
-
-            if (checkUser) {
-                if(!checkUser.isVerified) {
-                    await User.deleteOne({email})
-                } 
-                else {
-                    
-                    if (checkUser.username === username) {
-                        return res.status(400).json({message: "username exists"})
-                    }
-
-                    if (checkUser.email === email) {
-                        return res.status(400).json({message: "user with email already exists"})
-                    }
-
-                }
-            
-                
-            }
+            const {username, password, email}: IUser = req.body
             
             const hashedPassword = await bcrypt.hash(password, parseInt(process.env.SALTROUNDS as string))
-    
-            const user = {
+
+            const user: IBody = {
                 username,
                 email,
                 password: hashedPassword
             }
+            
+            const token = jwt.sign(user, process.env.SECRET as string)
+            console.log("this is the token",token)
 
-            const result = new User(user)
-            const newUserResult = await result.save()
-
-            // this is where i send the email to the user
-            sendVerificationEmail(newUserResult.email, newUserResult._id, 5)
+            sendVerificationEmail(email, token , 300000)
              
             
-            res.status(200).json({message: `verify account for ${newUserResult.username} to complete creation`})
+            res.status(200).json({message: `verify code has been sent to email`})
         } catch (err) {
             console.log(err)
             res.status(500).send(err)
@@ -58,17 +38,16 @@ dotenv.config()
     }
 
     export async function generateToken(req: Request, res: Response) {
-        const userId = req.params.userId
+        const email = req.params.email
         try {
-            const user = req.user as IUser
-
-            if(user.isVerified) {
-                return res.status(400).json({message: "user is already verified"})
+            const oldToken = await Token.findOne({email})
+            if(oldToken) {
+                await Token.deleteOne({ token: oldToken.token });
+            } else {
+                return res.status(400).json({message: "you need to sign up first"})
             }
-
-            await Token.updateMany({ userId }, { $set: { isValid: false } })
-
-            await sendVerificationEmail(user.email, user._id, 5)
+        
+            await sendVerificationEmail(email, oldToken?.encryptedToken as string, 300000)
 
             return res.status(200).json({message: "verification code has been sent"})
             
@@ -78,19 +57,17 @@ dotenv.config()
     }
 
     export async function verify(req: Request, res: Response) {
-        const { token, userId } = req.params;
+        const { code } = req.params;
 
-        if (!(token || userId)) {
-            return res.status(401).json({ message: "incomplete credential" });
+        if ( !code ) {
+            return res.status(401).json({ message: "you need to enter a code" });
         }
     
         try {
-            const user = req.user as IUser;
-
-            const databaseToken = await Token.findOne({ userId, token });
+            const databaseToken = await Token.findOne({ token: code });
     
             if (!databaseToken) {
-                return res.status(404).json({ message: "generate new token" });
+                return res.status(404).json({ message: "token has expired" });
             }
     
             const currentTime = Date.now();
@@ -103,12 +80,29 @@ dotenv.config()
             const timeDifferenceInMinutes = (currentTime - tokenCreationTime) / (1000 * 60);
     
             if (timeDifferenceInMinutes > 5) {
-                await Token.deleteOne({ _id: databaseToken._id });
+                databaseToken.isExpired == true
+                databaseToken.save()
                 return res.status(401).json({ message: "Token has expired" });
             }
-    
-            user.isVerified = true;
-            await user.save();
+
+            // i need to decode the token here 
+            const user = jwt.verify(databaseToken.encryptedToken, process.env.SECRET as string)
+
+            await Token.deleteOne({ token: databaseToken.token });
+            
+            console.log(user)
+
+            if (typeof user === "string") {
+                return user
+            }
+
+            const newUser = user as IBody
+
+            new User<IBody>({
+                username: newUser.username,
+                email: newUser.email,
+                password: newUser.password,
+            }).save()
 
             return res.status(200).json({ message: "account created successfully" });
     
@@ -118,6 +112,17 @@ dotenv.config()
         }
     }
 
-    export function login (req: Request, res: Response) {}
+    export async function changePassword(req: Request, res: Response) {
+        try {
+            
+        } catch (error) {
+            console.error(error)
+            return res.status(500).json({ message: "Internal server error" })
+        }
+    }
+
+    export function login (req: Request, res: Response) {
+        res.status(200).send({message: "loggedin successfully"})
+    }
 
 
