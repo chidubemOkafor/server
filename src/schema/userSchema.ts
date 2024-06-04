@@ -1,6 +1,6 @@
 import { Schema, Types, model } from "mongoose";
 import { IUser, VerifyUser, IToken } from "../interface/User";
-import { IAnimeArray, IAnimeContent } from "../interface/AnimeArraty";
+import { IAnimeArray, IAnimeContent } from "../interface/AnimeArray";
 
 const userSchema: Schema<IUser> = new Schema({
     username: { 
