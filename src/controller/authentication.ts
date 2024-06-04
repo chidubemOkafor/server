@@ -122,7 +122,15 @@ dotenv.config()
     }
 
     export function login (req: Request, res: Response) {
-        res.status(200).send({message: "loggedin successfully"})
+        res.status(200).send({message: "logged in"})
     }
 
-
+    export function logout (req: Request, res: Response) {
+        res.clearCookie('connect.sid'); 
+        req.logout((err) => {
+            console.log(err)
+            req.session.destroy((err) => {
+                res.status(200).json({message: "logged out"})
+            });
+        });
+    }

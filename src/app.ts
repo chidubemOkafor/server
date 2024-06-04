@@ -10,7 +10,7 @@ import cookieParser from "cookie-parser"
 import "./strategies/localStrategy"
 
 dotenv.config()
-const PORT = process.env.PORT
+const PORT = process.env.PORT || 9898
 
 const app = express()
 
@@ -28,13 +28,14 @@ app.use(session({
     secret: process.env.SECRET as string,
     store: sessionStore,
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     cookie: {
-        secure: true,
+        secure: process.env.NODE_ENV === 'production',
         maxAge: 1000 * 60 * 60 *24 // 24hrs
      }
 }))
 
+app.use(cookieParser())
 app.use(passport.initialize())
 app.use(passport.session())
 
