@@ -7,13 +7,12 @@ const userSchema: Schema<IUser> = new Schema({
         type: String, 
         required: true 
     },
-    profile_picture: {
+    profilePicture: {
         type: String, 
         default: null 
     },
-    tracking_anime: { 
-        type: [String],
-        default: [] 
+    trackingAnimeId: { 
+        type: Schema.Types.ObjectId, ref: 'UserAnime', required: true,
     },
     email: { 
         type: String, 
@@ -42,10 +41,7 @@ const AnimeContent: Schema<IAnimeContent> = new Schema({
 })
 
 const userAnime: Schema<IAnimeArray> = new Schema({
-    userId: {
-        type: Schema.Types.ObjectId, ref: 'User', required: true 
-    },
-    tracking_anime: {
+    trackingAnime: {
         type: [AnimeContent],
         default: []
     },

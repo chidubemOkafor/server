@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express"
 import { IBody, IUser, IToken } from "../interface/User"
 import bcrypt from "bcrypt"
 import dotenv from "dotenv"
-import { User, Token } from "../schema/userSchema"
+import { User, Token, UserAnime } from "../schema/userSchema"
 import { sendEmail } from "../utils/emailTransporter"
 import { sendVerificationEmail } from "../utils/sendVerificationEmail"
 import { Types } from "mongoose"
@@ -98,10 +98,14 @@ dotenv.config()
 
             const newUser = user as IBody
 
+            const newUserAnime = new UserAnime()
+            const userAnime = await newUserAnime.save()
+
             new User<IBody>({
                 username: newUser.username,
                 email: newUser.email,
                 password: newUser.password,
+                trackingAnimeId: userAnime._id
             }).save()
 
             return res.status(200).json({ message: "account created successfully" });

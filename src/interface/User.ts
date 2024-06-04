@@ -4,14 +4,15 @@ import { Document, Schema, Types } from "mongoose"
 interface IBody {
     username: string
     password: string
-    email: string
+    email: string,
+    trackingAnimeId?: Types.ObjectId,
 }
 
 interface IUser extends Document {
     _id?: Types.ObjectId,
     username: string,
-    profile_picture?: string | null,
-    tracking_anime?: Array<string> | null,
+    profilePicture?: string | null,
+    trackingAnimeId:Types.ObjectId,
     email: string,
     password: string,
     isSubscribed?: boolean,

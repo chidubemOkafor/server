@@ -13,8 +13,6 @@ export async function checkUser(
     if (user) {
       return res.status(404).json({ message: "user already exist" });
     }
-    req.body = user
- 
     next();
   } catch(error) {
     return res.status(500).json({message: "internal server error"})
