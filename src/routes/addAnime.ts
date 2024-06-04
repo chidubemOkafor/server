@@ -4,10 +4,10 @@ import { addAnime } from "../controller/animeFunction"
 
 // i need to import multer
 
-const router = express.Router()
+const anime = express.Router()
 
-router.post('/addAnime', isAuthenticated, (req: Request, res: Response) => addAnime(req, res) )
+anime.post('/addAnime',isAuthenticated, (req: Request, res: Response) => addAnime(req, res) )
 
 
-export default router
+export default anime
 //http://localhost:9898/api/v1//verify/UIPK15/6650f8257538a536fe8fb456
