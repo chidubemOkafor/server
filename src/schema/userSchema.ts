@@ -1,5 +1,6 @@
-import { Schema, model } from "mongoose";
+import { Schema, Types, model } from "mongoose";
 import { IUser, VerifyUser, IToken } from "../interface/User";
+import { IAnimeArray, IAnimeContent } from "../interface/AnimeArraty";
 
 const userSchema: Schema<IUser> = new Schema({
     username: { 
@@ -36,6 +37,28 @@ const userSchema: Schema<IUser> = new Schema({
     }
 });
 
+const AnimeContent: Schema<IAnimeContent> = new Schema({
+    name: String 
+})
+
+const userAnime: Schema<IAnimeArray> = new Schema({
+    userId: {
+        type: Schema.Types.ObjectId, ref: 'User', required: true 
+    },
+    tracking_anime: {
+        type: [AnimeContent],
+        default: []
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
+    updatedAt: {
+        type: Date,
+        default: Date.now
+    }
+})
+
 const tokenSchema: Schema<IToken> = new Schema({
     token: {
         type: String,
@@ -61,5 +84,8 @@ const tokenSchema: Schema<IToken> = new Schema({
 })
 
 
-export const Token = model("token", tokenSchema);
-export const User = model("User", userSchema)
+const Token = model("token", tokenSchema);
+const User = model("User", userSchema)
+const UserAnime = model("UserAnime", userAnime)
+
+export {Token, User, UserAnime}

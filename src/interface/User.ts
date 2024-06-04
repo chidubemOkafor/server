@@ -1,5 +1,4 @@
 import { Document, Schema, Types } from "mongoose"
-import { User } from "../schema/userSchema"
 
 
 interface IBody {
@@ -21,6 +20,7 @@ interface IUser extends Document {
 }
 
 interface IToken extends Document {
+    _id?: Types.ObjectId,
     token: string,
     encryptedToken: string,
     email: string,
