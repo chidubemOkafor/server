@@ -28,10 +28,10 @@ async function addAnime(req: Request, res: Response) {
             animeCollectionId = savedAnimeCollection._id;
             userAnimeCollection = savedAnimeCollection;
             
-            addTrackingAnime(userAnimeCollection, res, name as unknown as IAnimeContent)
+            addTrackingAnime(userAnimeCollection, res, name.toLocaleLowerCase() as unknown as IAnimeContent)
         }
 
-        addTrackingAnime(userAnimeCollection, res, name as unknown as IAnimeContent)
+        addTrackingAnime(userAnimeCollection, res, name.toLocaleLowerCase() as unknown as IAnimeContent)
 
     } catch (error) {
         console.error(error);
@@ -40,9 +40,24 @@ async function addAnime(req: Request, res: Response) {
 }
 
 async function removeAnime(req: Request, res: Response) {
+    const { name }: IAnimeContent = req.body;
+    const userDetail = req.user as IUser;
     try {
-        // first of all 
+        const trackingAnimes = await UserAnime.findById(userDetail.trackingAnimeId)
+        if (!trackingAnimes)  return res.status(404).json({message: "no collection for user"})
+            const nameInLowerCase  =  name.toLocaleLowerCase()
+            const animeArray = trackingAnimes.trackingAnime
 
+            const index = animeArray?.findIndex(anime => anime.name.toLocaleLowerCase() === nameInLowerCase)
+
+            if (index === -1 || index === undefined) {
+                return res.status(404).json({ message: "Anime not found in collection" });
+            }
+
+            animeArray?.splice(index, 1)
+            await trackingAnimes.save()
+
+            return res.status(200).json({ message: `${name} has been removed successfully` });
     } catch (error) {
         console.error(error)
         res.status(500).json({message: "Internal server error"})
@@ -50,8 +65,8 @@ async function removeAnime(req: Request, res: Response) {
 }
 
 async function getAllTrackingAnime(req: Request, res: Response) {
+    const userDetail = req.user as IUser;
     try {
-        const userDetail = req.user as IUser;
         const trackingAnimes = await UserAnime.findById(userDetail.trackingAnimeId)
 
         if(!trackingAnimes) return res.status(404).json({message: "nothing found"}) // this should never return because it is [] default
