@@ -41,6 +41,7 @@ async function addAnime(req: Request, res: Response) {
 
 async function removeAnime(req: Request, res: Response) {
     try {
+        // first of all 
 
     } catch (error) {
         console.error(error)
@@ -51,7 +52,7 @@ async function removeAnime(req: Request, res: Response) {
 async function getAllTrackingAnime(req: Request, res: Response) {
     try {
         const userDetail = req.user as IUser;
-        const trackingAnimes = await UserAnime.findById(userDetail)
+        const trackingAnimes = await UserAnime.findById(userDetail.trackingAnimeId)
 
         if(!trackingAnimes) return res.status(404).json({message: "nothing found"}) // this should never return because it is [] default
         return res.status(200).json({message: "success", result: trackingAnimes.trackingAnime})
