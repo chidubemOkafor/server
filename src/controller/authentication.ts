@@ -10,7 +10,7 @@ import jwt from "jsonwebtoken"
 
 dotenv.config()
 
-    export async function createAccount(req: Request, res: Response) {
+    async function createAccount(req: Request, res: Response) {
         try {
 
             const {username, password, email}: IUser = req.body
@@ -37,7 +37,7 @@ dotenv.config()
       
     }
 
-    export async function generateToken(req: Request, res: Response) {
+    async function generateToken(req: Request, res: Response) {
         const email = req.params.email
         try {
             const oldToken = await Token.findOne({email})
@@ -56,7 +56,7 @@ dotenv.config()
         }
     }
 
-    export async function verify(req: Request, res: Response) {
+    async function verify(req: Request, res: Response) {
         const { code } = req.params;
 
         if ( !code ) {
@@ -116,7 +116,7 @@ dotenv.config()
         }
     }
 
-    export async function changePassword(req: Request, res: Response) {
+    async function changePassword(req: Request, res: Response) {
         try {
             
         } catch (error) {
@@ -125,11 +125,11 @@ dotenv.config()
         }
     }
 
-    export function login (req: Request, res: Response) {
+    function login (req: Request, res: Response) {
         res.status(200).send({message: "logged in"})
     }
 
-    export function logout (req: Request, res: Response) {
+    function logout (req: Request, res: Response) {
         res.clearCookie('connect.sid'); 
         req.logout((err) => {
             console.log(err)
@@ -137,4 +137,13 @@ dotenv.config()
                 res.status(200).json({message: "logged out"})
             });
         });
+    }
+
+    export {
+        createAccount,
+        generateToken,
+        verify,
+        changePassword,
+        login,
+        logout
     }

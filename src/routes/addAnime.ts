@@ -1,12 +1,13 @@
 import express, { Request, Response } from "express"
 import { isAuthenticated } from "../middleware/isAuthenticated"
-import { addAnime } from "../controller/animeFunction"
+import { addAnime, getAllTrackingAnime } from "../controller/animeFunction"
 
 // i need to import multer
 
 const anime = express.Router()
 
-anime.post('/addAnime',isAuthenticated, (req: Request, res: Response) => addAnime(req, res) )
+anime.post('/addAnime',isAuthenticated, addAnime)
+anime.get('/getAllTrackingAnime',isAuthenticated, getAllTrackingAnime)
 
 
 export default anime

@@ -3,12 +3,12 @@ import { Document, Schema, Types } from "mongoose"
 
 interface IAnimeArray extends Document {
     _id?: Types.ObjectId,
-    trackingAnime?: Array<string>,
+    trackingAnime?: Array<IAnimeContent>,
     createdAt: Date,
     updatedAt: Date
 }
 
-interface IAnimeContent extends Document {
+interface IAnimeContent {
     name: string
 }
 
