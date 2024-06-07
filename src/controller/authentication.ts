@@ -10,7 +10,13 @@ import jwt from "jsonwebtoken"
 
 dotenv.config()
 
-    async function createAccount(req: Request, res: Response) {
+    /**
+    * function to create account
+    * @param {Request} req - the request object containing the user detail
+    * @param {Response} res - the response object to send to the response
+    * @return {Promise<void>} - this return a promise
+    */
+    async function createAccount(req: Request, res: Response): Promise<void> {
         try {
 
             const {username, password, email}: IUser = req.body
@@ -37,7 +43,13 @@ dotenv.config()
       
     }
 
-    async function generateToken(req: Request, res: Response) {
+     /**
+    * function to create account
+    * @param {Request} req - the request object containing the user detail
+    * @param {Response} res - the response object to send to the response
+    * @return {Promise<Response | undefined>} - this return a promise
+    */
+    async function generateToken(req: Request, res: Response): Promise<Response | undefined> {
         const email = req.params.email
         try {
             const oldToken = await Token.findOne({email})
@@ -56,7 +68,13 @@ dotenv.config()
         }
     }
 
-    async function verify(req: Request, res: Response) {
+      /**
+    * function to create account
+    * @param {Request} req - the request object containing the user detail
+    * @param {Response} res - the response object to send to the response
+    * @return {Promise<string | Response>} - this return a promise
+    */
+    async function verify(req: Request, res: Response): Promise<string | Response> {
         const { code } = req.params;
 
         if ( !code ) {
@@ -116,7 +134,13 @@ dotenv.config()
         }
     }
 
-    async function changePassword(req: Request, res: Response) {
+      /**
+    * function to create account
+    * @param {Request} req - the request object containing the user detail
+    * @param {Response} res - the response object to send to the response
+    * @return {Promise<Response | undefined>} - this return a promise
+    */
+    async function changePassword(req: Request, res: Response): Promise<Response | undefined> {
         try {
             
         } catch (error) {
@@ -125,11 +149,23 @@ dotenv.config()
         }
     }
 
-    function login (req: Request, res: Response) {
-        res.status(200).send({message: "logged in"})
+     /**
+    * function to create account
+    * @param {Request} req - the request object containing the user detail
+    * @param {Response} res - the response object to send to the response
+    * @return {Response<Record<string, string>>} - this return a promise
+    */
+    function login (req: Request, res: Response): Response<Record<string, string>> {
+        return res.status(200).send({message: "logged in"})
     }
 
-    function logout (req: Request, res: Response) {
+     /**
+    * function to create account
+    * @param {Request} req - the request object containing the user detail
+    * @param {Response} res - the response object to send to the response
+    * @return {void} - this return a promise
+    */
+    function logout (req: Request, res: Response): void {
         res.clearCookie('connect.sid'); 
         req.logout((err) => {
             console.log(err)
