@@ -1,11 +1,9 @@
-import { Request, Response, NextFunction } from "express"
-import { IBody, IUser, IToken } from "../interface/User"
+import { Request, Response } from "express"
+import { IBody, IUser } from "../interface/User"
 import bcrypt from "bcrypt"
 import dotenv from "dotenv"
 import { User, Token, UserAnime } from "../schema/userSchema"
-import { sendEmail } from "../utils/emailTransporter"
 import { sendVerificationEmail } from "../utils/sendVerificationEmail"
-import { Types } from "mongoose"
 import jwt from "jsonwebtoken"
 
 dotenv.config()
@@ -14,9 +12,9 @@ dotenv.config()
     * function to create account
     * @param {Request} req - the request object containing the user detail
     * @param {Response} res - the response object to send to the response
-    * @return {Promise<void>} - this return a promise
+    * @return {Promise<Response>} - this return a promise
     */
-    async function createAccount(req: Request, res: Response): Promise<void> {
+    async function createAccount(req: Request, res: Response): Promise<Response<Record<string, string>>> {
         try {
 
             const {username, password, email}: IUser = req.body
@@ -30,15 +28,13 @@ dotenv.config()
             }
             
             const token = jwt.sign(user, process.env.SECRET as string)
-            console.log("this is the token",token)
 
             sendVerificationEmail(email, token , 300000)
              
             
-            res.status(200).json({message: `verify code has been sent to email`})
-        } catch (err) {
-            console.log(err)
-            res.status(500).send(err)
+            return res.status(200).json({message: `verify code has been sent to email`})
+        } catch (error) {
+            return res.status(500).json({ message: "Internal server error", error: error })
         }
       
     }
@@ -64,7 +60,7 @@ dotenv.config()
             return res.status(200).json({message: "verification code has been sent"})
             
         } catch (error) {
-            console.error(error)
+            return res.status(500).json({ message: "Internal server error", error: error })
         }
     }
 
@@ -107,8 +103,6 @@ dotenv.config()
             const user = jwt.verify(databaseToken.encryptedToken, process.env.SECRET as string)
 
             await Token.deleteOne({ token: databaseToken.token });
-            
-            console.log(user)
 
             if (typeof user === "string") {
                 return user
@@ -129,8 +123,7 @@ dotenv.config()
             return res.status(200).json({ message: "account created successfully" });
     
         } catch (error) {
-            console.error(error);
-            return res.status(500).json({ message: "Internal server error" });
+            return res.status(500).json({ message: "Internal server error", error: error })
         }
     }
 
@@ -140,12 +133,11 @@ dotenv.config()
     * @param {Response} res - the response object to send to the response
     * @return {Promise<Response | undefined>} - this return a promise
     */
-    async function changePassword(req: Request, res: Response): Promise<Response | undefined> {
+    async function changePassword(req: Request, res: Response): Promise<Response> {
         try {
-            
+            return res.send()
         } catch (error) {
-            console.error(error)
-            return res.status(500).json({ message: "Internal server error" })
+            return res.status(500).json({ message: "Internal server error", error: error })
         }
     }
 
@@ -167,8 +159,8 @@ dotenv.config()
     */
     function logout (req: Request, res: Response): void {
         res.clearCookie('connect.sid'); 
-        req.logout((err) => {
-            console.log(err)
+        req.logout((err) => { 
+            res.status(500).json({ message: "Internal server error", error: err })
             req.session.destroy((err) => {
                 res.status(200).json({message: "logged out"})
             });
