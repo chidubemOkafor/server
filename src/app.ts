@@ -11,7 +11,7 @@ import "./strategies/localStrategy"
 import anime from "./routes/addAnime"
 
 dotenv.config()
-const PORT = process.env.PORT || 9898
+const PORT = process.env.PORT || 8000
 
 const app = express()
 
@@ -45,5 +45,5 @@ app.use('/api/v1', anime)
 
 app.listen(PORT, () => {
 
-    console.log(`app is listening on port ${PORT}`)
+    console.log(`app is listening on port ${PORT} here`)
 })

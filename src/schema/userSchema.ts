@@ -79,7 +79,6 @@ const tokenSchema: Schema<IToken> = new Schema({
     }
 })
 
-
 const Token = model("token", tokenSchema);
 const User = model("User", userSchema)
 const UserAnime = model("UserAnime", userAnime)

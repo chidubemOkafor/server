@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
-import { UserAnime, User } from "../schema/userSchema";
+import { User, UserAnime } from "../schema/userSchema";
 import { IUser } from "../interface/User";
 import { IAnimeContent } from "../interface/AnimeArray";
 import { addTrackingAnime } from "../utils/addTrackingAnime";
+import { Animecollection } from "../schema/animeSchema";
 
 async function addAnime(req: Request, res: Response) {
     const { name }: IAnimeContent = req.body;
@@ -10,6 +11,8 @@ async function addAnime(req: Request, res: Response) {
     let animeCollectionId = userDetail.trackingAnimeId;
 
     try {
+        if(!UserAnime) throw new Error("schema error")
+            
         let userAnimeCollection = await UserAnime.findById(animeCollectionId);
 
         if (!userAnimeCollection) {
@@ -43,7 +46,7 @@ async function removeAnime(req: Request, res: Response) {
     const { name }: IAnimeContent = req.body;
     const userDetail = req.user as IUser;
     try {
-        const trackingAnimes = await UserAnime.findById(userDetail.trackingAnimeId)
+        const trackingAnimes = await UserAnime?.findById(userDetail.trackingAnimeId)
         if (!trackingAnimes)  return res.status(404).json({message: "no collection for user"})
             const nameInLowerCase  =  name.toLocaleLowerCase()
             const animeArray = trackingAnimes.trackingAnime
@@ -70,13 +73,33 @@ async function getAllTrackingAnime(req: Request, res: Response) {
         const trackingAnimes = await UserAnime.findById(userDetail.trackingAnimeId)
 
         if(!trackingAnimes) return res.status(404).json({message: "nothing found"}) // this should never return because it is [] default
-        return res.status(200).json({message: "success", result: trackingAnimes.trackingAnime})
+
+        // return the anime details
+
+        const animeContentArray = trackingAnimes?.trackingAnime
+       
+        if (animeContentArray === undefined) return res.status(404).json({message: "animeContent is undefined"})
+        console.log(animeContentArray[0].name)
+
+        for (let i = 0; i < animeContentArray.length; i++) {
+            
+        }
+
+        const name = animeContentArray[0].name
+        const anime = await Animecollection.findOne({name})
+        console.log(Animecollection.length)
+        console.log(anime)
+
+        if (!anime) return res.status(404).json({message: "anime not found"})
+    
+        return res.status(200).json({message: "success", result: anime})
         
     } catch (error) {
         console.error(error)
         res.status(500).json({message: "Internal server error"})
     }
 }
+
 
 
 export { 

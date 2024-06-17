@@ -2,7 +2,7 @@ import { Request, Response } from "express"
 import { IBody, IUser } from "../interface/User"
 import bcrypt from "bcrypt"
 import dotenv from "dotenv"
-import { User, Token, UserAnime } from "../schema/userSchema"
+import { Token, User, UserAnime } from "../schema/userSchema"
 import { sendVerificationEmail } from "../utils/sendVerificationEmail"
 import jwt from "jsonwebtoken"
 
@@ -48,9 +48,9 @@ dotenv.config()
     async function generateToken(req: Request, res: Response): Promise<Response | undefined> {
         const email = req.params.email
         try {
-            const oldToken = await Token.findOne({email})
+            const oldToken = await Token?.findOne({email})
             if(oldToken) {
-                await Token.deleteOne({ token: oldToken.token });
+                await Token?.deleteOne({ token: oldToken.token });
             } else {
                 return res.status(400).json({message: "you need to sign up first"})
             }
@@ -72,13 +72,12 @@ dotenv.config()
     */
     async function verify(req: Request, res: Response): Promise<string | Response> {
         const { code } = req.params;
-
         if ( !code ) {
             return res.status(401).json({ message: "you need to enter a code" });
         }
     
         try {
-            const databaseToken = await Token.findOne({ token: code });
+            const databaseToken = await Token?.findOne({ token: code });
     
             if (!databaseToken) {
                 return res.status(404).json({ message: "token has expired" });
@@ -102,13 +101,15 @@ dotenv.config()
             // i need to decode the token here 
             const user = jwt.verify(databaseToken.encryptedToken, process.env.SECRET as string)
 
-            await Token.deleteOne({ token: databaseToken.token });
+            await Token?.deleteOne({ token: databaseToken.token });
 
             if (typeof user === "string") {
                 return user
             }
 
             const newUser = user as IBody
+            
+            if(!UserAnime || !User) throw new Error("invalid models")
 
             const newUserAnime = new UserAnime()
             const userAnime = await newUserAnime.save()
