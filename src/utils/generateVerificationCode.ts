@@ -2,7 +2,7 @@ import randomstring from 'randomstring';
 import { Token } from '../schema/userSchema';
 import { IToken } from '../interface/User';
 
-export const generateVerificationCodeAndSaveToDatabase = async(_to: string, _encriptedToken: string, duration: number): Promise<string> => {
+export async function generateVerificationCodeAndSaveToDatabase (_to: string, _encriptedToken: string, duration: number): Promise<string> {
     const verificationCode = randomstring.generate(6);
 
     await Token.deleteMany({email: _to})
