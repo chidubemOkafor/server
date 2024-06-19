@@ -9,6 +9,7 @@ import passport from "passport"
 import cookieParser from "cookie-parser"
 import "./strategies/localStrategy"
 import anime from "./routes/addAnime"
+import homeAnime from './routes/homeAnime'
 
 dotenv.config()
 const PORT = process.env.PORT || 8000
@@ -42,6 +43,7 @@ app.use(passport.session())
 
 app.use('/api/v1', auth)
 app.use('/api/v1', anime)
+app.use('/api/v1', homeAnime)
 
 app.listen(PORT, () => {
 
