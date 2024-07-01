@@ -1,15 +1,17 @@
-import { createAccount, generateToken, verify, login } from "../controller/authentication"
-import express, { Request, Response } from "express"
+import { createAccount, generateToken, verify, login, logout } from "../controller/authentication"
+import express from "express"
 import "../strategies/localStrategy"
 import passport from "passport"
 import { checkUser } from "../middleware/checkUser"
+import { isAuthenticated } from "../middleware/isAuthenticated"
 
-const router = express.Router()
+const auth = express.Router()
 
-router.post('/createAccount',(req: Request, res: Response) => createAccount(req, res)) //passport.authenticate("local")
-router.post('/generateNewToken/:userId',checkUser, (req: Request, res: Response) => generateToken(req, res))
-router.post('/verify/:token/:userId',checkUser, (req: Request, res: Response) => verify(req, res))
-router.get('/login',passport.authenticate("local"), (req: Request, res:  Response) => login(req, res))
+auth.post('/createAccount',checkUser, createAccount) //passport.authenticate("local")
+auth.post('/generateNewToken/:email', generateToken)
+auth.post('/verify/:code', verify)
+auth.post('/login',passport.authenticate("local"), login)
+auth.post('/logout',isAuthenticated, logout)
 
-export default router
+export default auth
 //http://localhost:9898/api/v1//verify/UIPK15/6650f8257538a536fe8fb456

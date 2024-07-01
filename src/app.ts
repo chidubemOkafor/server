@@ -1,22 +1,23 @@
 import "./connection"
 import express from "express"
 import dotenv from "dotenv"
-import router from "./routes/authentication"
+import auth from "./routes/authentication"
 import { CONNECTION_URL  } from "./connection"
 import MongoStore from "connect-mongo"
 import session from "express-session"
 import passport from "passport"
 import cookieParser from "cookie-parser"
 import "./strategies/localStrategy"
+import anime from "./routes/addAnime"
+import homeAnime from './routes/homeAnime'
 
 dotenv.config()
-const PORT = process.env.PORT
+const PORT = process.env.PORT || 8000
 
 const app = express()
 
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
-app.use(cookieParser("token"))
 
 const sessionStore = MongoStore.create(
     {
@@ -29,19 +30,22 @@ app.use(session({
     secret: process.env.SECRET as string,
     store: sessionStore,
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     cookie: {
-        secure: true,
+        secure: process.env.NODE_ENV === 'production',
         maxAge: 1000 * 60 * 60 *24 // 24hrs
      }
 }))
 
+app.use(cookieParser())
 app.use(passport.initialize())
 app.use(passport.session())
 
-app.use('/api/v1', router)
+app.use('/api/v1', auth)
+app.use('/api/v1', anime)
+app.use('/api/v1', homeAnime)
 
 app.listen(PORT, () => {
 
-    console.log(`app is listening on port ${PORT}`)
+    console.log(`app is listening on port ${PORT} here`)
 })

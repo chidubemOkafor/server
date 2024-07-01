@@ -6,16 +6,13 @@ export async function checkUser(
   res: Response,
   next: NextFunction,
 ) {
-  const { userId } = req.params
+  const { email } = req.body
   try {
-    const user = await User.findOne({ _id: userId });
+    const user = await User.findOne({ email });
 
-    if (!user) {
-      return res.status(404).json({ message: "user does not exist" });
+    if (user) {
+      return res.status(404).json({ message: "user already exist" });
     }
-
-    req.user = user;
- 
     next();
   } catch(error) {
     return res.status(500).json({message: "internal server error"})

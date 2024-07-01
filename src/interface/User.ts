@@ -1,29 +1,31 @@
 import { Document, Schema, Types } from "mongoose"
-import { User } from "../schema/userSchema"
 
 
 interface IBody {
     username: string
     password: string
-    email: string
+    email: string,
+    trackingAnimeId?: Types.ObjectId,
 }
 
 interface IUser extends Document {
-    _id: Types.ObjectId,
+    _id?: Types.ObjectId,
     username: string,
-    profile_picture?: string | null,
-    tracking_anime?: Array<string> | null,
+    profilePicture?: string | null,
+    trackingAnimeId:Types.ObjectId,
     email: string,
     password: string,
-    isVerified: boolean,
-    isSubscribed: boolean,
+    isSubscribed?: boolean,
     createdAt?: Date,
     updatedAt?: Date
 }
 
 interface IToken extends Document {
-    userId: Schema.Types.ObjectId,
+    _id?: Types.ObjectId,
     token: string,
+    encryptedToken: string,
+    email: string,
+    isExpired: boolean,
     createdAt?: Date,
     isValid: boolean
 }

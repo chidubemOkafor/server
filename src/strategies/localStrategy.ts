@@ -4,7 +4,6 @@ import { User } from "../schema/userSchema";
 import { IUser } from "../interface/User";
 import "../connection"
 import bcrypt from 'bcrypt'
-import { Types } from "mongoose";
 
 export default passport.use(
     new Strategy({usernameField: "email"}, async (email, password, done) => {
@@ -29,9 +28,9 @@ export default passport.use(
     })
 )
 
-passport.serializeUser((user: IUser, done) => {
-    console.log("seriremail", user)
-    done(null, user._id)
+passport.serializeUser((user, done) => {
+    const newUser = user as IUser
+    done(null, newUser)
 })
 
 passport.deserializeUser(async (id, done) => {

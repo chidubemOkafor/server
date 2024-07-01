@@ -1,18 +1,18 @@
-import { Schema, model } from "mongoose";
+import { Schema, Types, model } from "mongoose";
 import { IUser, VerifyUser, IToken } from "../interface/User";
+import { IAnimeArray, IAnimeContent } from "../interface/AnimeArray";
 
 const userSchema: Schema<IUser> = new Schema({
     username: { 
         type: String, 
         required: true 
     },
-    profile_picture: {
+    profilePicture: {
         type: String, 
         default: null 
     },
-    tracking_anime: { 
-        type: [String],
-        default: [] 
+    trackingAnimeId: { 
+        type: Schema.Types.ObjectId, ref: 'UserAnime', required: true,
     },
     email: { 
         type: String, 
@@ -21,10 +21,6 @@ const userSchema: Schema<IUser> = new Schema({
     password: { 
         type: String, 
         required: true 
-    },
-    isVerified: {
-        type: Boolean, 
-        default: false
     },
     isSubscribed: {
         type: Boolean,  
@@ -40,13 +36,40 @@ const userSchema: Schema<IUser> = new Schema({
     }
 });
 
-const tokenSchema: Schema<IToken> = new Schema({
-    userId: { 
-        type: Schema.Types.ObjectId,
-        ref: "User",
-        required: true,
+const AnimeContent: Schema<IAnimeContent> = new Schema({
+    name: String 
+})
+
+const userAnime: Schema<IAnimeArray> = new Schema({
+    trackingAnime: {
+        type: [AnimeContent],
+        default: []
     },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
+    updatedAt: {
+        type: Date,
+        default: Date.now
+    }
+})
+
+const tokenSchema: Schema<IToken> = new Schema({
     token: {
+        type: String,
+        required: true
+    },
+    encryptedToken: {
+        type: String,
+        required: true
+    },
+    isExpired: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
+    email: {
         type: String,
         required: true
     },
@@ -56,6 +79,8 @@ const tokenSchema: Schema<IToken> = new Schema({
     }
 })
 
+const Token = model("token", tokenSchema);
+const User = model("User", userSchema)
+const UserAnime = model("UserAnime", userAnime)
 
-export const Token = model("token", tokenSchema);
-export const User = model("User", userSchema)
+export {Token, User, UserAnime}
