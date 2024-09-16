@@ -43,14 +43,14 @@ async function addAnime(req: Request, res: Response) {
 }
 
 async function removeAnime(req: Request, res: Response) {
-    const { name }: IAnimeContent = req.body;
+    const removeName = req.params.name;
     const userDetail = req.user as IUser;
     try {
         const trackingAnimes = await UserAnime.findById(userDetail.trackingAnimeId)
         if (!trackingAnimes) return res.status(404).json({ message: "no collection for user" })
         const animeArray = trackingAnimes.trackingAnime
 
-        const index = animeArray?.findIndex(anime => anime.name === name)
+        const index = animeArray?.findIndex(anime => anime.name === removeName)
 
         if (index === -1 || index === undefined) {
             return res.status(404).json({ message: "Anime not found in collection" });
@@ -59,7 +59,7 @@ async function removeAnime(req: Request, res: Response) {
         animeArray?.splice(index, 1)
         await trackingAnimes.save()
 
-        return res.status(200).json({ message: `${name} has been removed successfully` });
+        return res.status(200).json({ message: `${removeName} has been removed successfully` });
     } catch (error) {
         console.error(error)
         res.status(500).json({ message: "Internal server error" })

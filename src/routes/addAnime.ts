@@ -8,7 +8,7 @@ const anime = express.Router()
 
 anime.post('/addAnime', isAuthenticated, addAnime)
 anime.get('/getAllTrackingAnime', isAuthenticated, getAllTrackingAnime)
-anime.delete('/removeAnime', isAuthenticated, removeAnime)
+anime.delete('/removeAnime/:removeName', isAuthenticated, removeAnime)
 
 
 export default anime
