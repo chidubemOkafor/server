@@ -98,7 +98,7 @@ dotenv.config()
                 return res.status(401).json({ message: "Token has expired" });
             }
 
-            // i need to decode the token here 
+            // i need to verify the token here 
             const user = jwt.verify(databaseToken.encryptedToken, process.env.SECRET as string)
 
             await Token?.deleteOne({ token: databaseToken.token });
@@ -136,7 +136,31 @@ dotenv.config()
     */
     async function changePassword(req: Request, res: Response): Promise<Response> {
         try {
-            return res.send()
+        const { oldPassword, newPassword, email } = req.body
+        const user = await User.findOne({email})
+        if(!user) {
+            return res.status(404).json({message: "user not found"})
+        }
+        console.log("user")
+        console.log(user)
+        res.status(200).json({message: user})
+        
+        const checkPassword = bcrypt.compare(oldPassword, user?.password)
+        if(!checkPassword) {
+            return res.status(401).json({message: "password is incorrect"})
+        }
+
+        if(oldPassword === newPassword) {
+            return res.status(401).json({message: "same as the old"})
+        }
+        } catch (error) {
+            return res.status(500).json({ message: "Internal server error", error: error })
+        }
+    }
+
+    async function checkAuth(req: Request, res: Response):Promise<Response> {
+        try {
+            return res.status(200).json({message: "Loggedin"})
         } catch (error) {
             return res.status(500).json({ message: "Internal server error", error: error })
         }
@@ -174,5 +198,6 @@ dotenv.config()
         verify,
         changePassword,
         login,
-        logout
+        logout,
+        checkAuth
     }

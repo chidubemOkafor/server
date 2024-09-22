@@ -10,11 +10,17 @@ import cookieParser from "cookie-parser"
 import "./strategies/localStrategy"
 import anime from "./routes/addAnime"
 import homeAnime from './routes/homeAnime'
+import cors from 'cors'
 
 dotenv.config()
 const PORT = process.env.PORT || 8000
 
 const app = express()
+
+app.use(cors({
+    origin: 'http://localhost:5173', // Replace with your frontend's origin
+    credentials: true
+  }));
 
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
@@ -46,6 +52,5 @@ app.use('/api/v1', anime)
 app.use('/api/v1', homeAnime)
 
 app.listen(PORT, () => {
-
     console.log(`app is listening on port ${PORT} here`)
 })

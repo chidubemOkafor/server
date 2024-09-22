@@ -3,10 +3,15 @@ import { Request, Response } from "express";
 import { handlePagination } from "../utils/handlePagination";
 
 
+    // I need to write the discription on how this pagination feature work
+    // you need ?page = page_number to select the page
+    // you need ?limit = limit_mumber to select the amount of content displayed on the page
+    // you need ?genre = valid_genre_name to select filter the genre
 
 async function getHomeAnime(req: Request, res: Response) {
-    const genresArray: string  = req.query.genre as string || '[]'
+    const genresArray: string  = req.query.genre as string
     console.log(req.query.genre)
+   
 
         let arrayToSend: Array<string> | [];
         const genres: Array<string> = genresArray.slice(1, -1).split(',')
@@ -17,9 +22,8 @@ async function getHomeAnime(req: Request, res: Response) {
         } else {
             arrayToSend = parsedGenre
         }
-
     let pageLimit: number = parseInt(req.query.limit as string)  || 10
-    let page: number = parseInt(req.query.p as string) || 1
+    let page: number = parseInt(req.query.page as string) || 1
 
     try  {
         const result = await handlePagination(Animecollection, page, pageLimit, arrayToSend) // if you send [] it doesn't filter

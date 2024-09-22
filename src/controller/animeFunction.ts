@@ -6,7 +6,7 @@ import { addTrackingAnime } from "../utils/addTrackingAnime";
 import { Animecollection } from "../schema/animeSchema";
 
 async function addAnime(req: Request, res: Response) {
-    const { name }: IAnimeContent = req.body;
+    const  name = req.params.name
     const userDetail = req.user as IUser;
     let animeCollectionId = userDetail.trackingAnimeId;
 
@@ -45,12 +45,15 @@ async function addAnime(req: Request, res: Response) {
 async function removeAnime(req: Request, res: Response) {
     const removeName = req.params.name;
     const userDetail = req.user as IUser;
+    console.log(removeName)
     try {
         const trackingAnimes = await UserAnime.findById(userDetail.trackingAnimeId)
         if (!trackingAnimes) return res.status(404).json({ message: "no collection for user" })
         const animeArray = trackingAnimes.trackingAnime
+        console.log(animeArray)
 
         const index = animeArray?.findIndex(anime => anime.name === removeName)
+        console.log(index)
 
         if (index === -1 || index === undefined) {
             return res.status(404).json({ message: "Anime not found in collection" });
