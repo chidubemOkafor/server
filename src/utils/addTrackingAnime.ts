@@ -16,7 +16,7 @@ async function addTrackingAnime(userAnimeCollection: IAnimeArray, res: Response,
         return res.status(409).json({ message: "Anime with this name already exists" });
     }
 
-    animeArray.push({ name } as unknown as IAnimeContent);
+    animeArray.push({ name: name, animeId:  } as unknown as IAnimeContent);
     await userAnimeCollection.save();
 
     res.status(200).json({ message: `${name} has been added successfully` });

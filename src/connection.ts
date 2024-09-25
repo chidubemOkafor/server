@@ -16,7 +16,6 @@ const clientOptions: ConnectOptions = {
 async function connectToDatabase(url: string):Promise<void> {
   try {
     await mongoose.connect(url, clientOptions);
-    await mongoose.connection.db.admin().command({ ping: 1 });
     console.log(`Pinged your deployment. You successfully connected to MongoDB!`);
   } catch (err) {
     console.error('Error connecting to database:', err);

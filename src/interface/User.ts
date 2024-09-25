@@ -12,7 +12,7 @@ interface IUser extends Document {
     _id?: Types.ObjectId,
     username: string,
     profilePicture?: string | null,
-    trackingAnimeId:Types.ObjectId,
+    trackingAnimeId?:Types.ObjectId,
     email: string,
     password: string,
     isSubscribed?: boolean,

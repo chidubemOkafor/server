@@ -1,4 +1,4 @@
-import { Document, Schema, Types } from "mongoose"
+import { Document, ObjectId, Schema, Types } from "mongoose"
 
 
 interface IAnimeArray extends Document {
@@ -9,6 +9,7 @@ interface IAnimeArray extends Document {
 }
 
 interface IAnimeContent {
+    _id: any | ObjectId
     name: string
     alt_name: string
     description: string
@@ -21,7 +22,7 @@ interface IAnimeContent {
     type: string
     season: string
     source: string
-    release_time_sub: string
+    "release_time(sub)": string
     streaming_sites: Array<string>
     official_website: string
 }

@@ -11,8 +11,10 @@ import "./strategies/localStrategy"
 import anime from "./routes/addAnime"
 import homeAnime from './routes/homeAnime'
 import cors from 'cors'
+import { notification } from "./notification"
 
 dotenv.config()
+notification()
 const PORT = process.env.PORT || 8000
 
 const app = express()

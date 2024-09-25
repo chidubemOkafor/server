@@ -39,7 +39,8 @@ async function getHomeAnime(req: Request, res: Response) {
 async function searchAnime(req:Request, res:Response) {
     try {
         const findname = req.params.name;
-        const objs = await Animecollection.find({name:{ $regex:'.*'+findname+'.*'} });
+        const regex = new RegExp(`.*${findname}.*`, 'i');
+        const objs = await Animecollection.find({name:{ $regex: regex} });
         res.json(objs);
     } catch (error) {
         console.error(error)

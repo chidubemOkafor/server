@@ -134,7 +134,7 @@ dotenv.config()
     * @param {Response} res - the response object to send to the response
     * @return {Promise<Response | undefined>} - this return a promise
     */
-    async function changePassword(req: Request, res: Response): Promise<Response> {
+    async function changePassword(req: Request, res: Response): Promise<Response | undefined> {
         try {
         const { oldPassword, newPassword, email } = req.body
         const user = await User.findOne({email})
