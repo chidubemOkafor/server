@@ -8,7 +8,7 @@ interface IBody {
     email: string,
 }
 
-interface IUser extends Document {
+interface IUser {
     _id?: Types.ObjectId,
     username: string,
     profilePicture?: string | null,
@@ -20,7 +20,7 @@ interface IUser extends Document {
     updatedAt?: Date
 }
 
-interface IToken extends Document {
+interface IToken {
     _id?: Types.ObjectId,
     token: string,
     encryptedToken: string,

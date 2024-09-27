@@ -74,11 +74,13 @@ async function removeAnime(req: Request, res: Response) {
 async function getAllTrackingAnime(req: Request, res: Response) {
     const userDetail = req.user as IUser;
     try {
+        console.log("userDetail: ",userDetail)
         const validResults = []
         const animeArray = userDetail.trackingAnimes
 
         if (animeArray.length === 0) {
-            return res.status(300).json({ message: "No anime to display" });
+            res.set('Cache-Control', 'no-store');
+            return res.status(404).json({ message: "No anime to displays" });
         }
 
         const animePromise = animeArray.map(async (animeName) => {
@@ -89,6 +91,7 @@ async function getAllTrackingAnime(req: Request, res: Response) {
         const results = await Promise.all(animePromise)
         validResults.push(...results)
 
+        res.set('Cache-Control', 'no-store');
         return res.status(200).json({ message: "success", anime: validResults });
 
     } catch (error) {

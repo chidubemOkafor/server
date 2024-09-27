@@ -10,6 +10,7 @@ import cookieParser from "cookie-parser"
 import "./strategies/localStrategy"
 import anime from "./routes/addAnime"
 import homeAnime from './routes/homeAnime'
+import profile from './routes/profile'
 import cors from 'cors'
 import { notification } from "./notification"
 
@@ -52,6 +53,7 @@ app.use(passport.session())
 app.use('/api/v1', auth)
 app.use('/api/v1', anime)
 app.use('/api/v1', homeAnime)
+app.use('/api/v1', profile)
 
 app.listen(PORT, () => {
     console.log(`app is listening on port ${PORT} here`)

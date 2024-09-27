@@ -7,7 +7,7 @@ import { addAnime, getAllTrackingAnime, removeAnime } from "../controller/animeF
 const anime = express.Router()
 
 anime.post('/addAnime/:name', isAuthenticated, addAnime)
-anime.get('/getAllTrackingAnime', isAuthenticated, getAllTrackingAnime)
+anime.get('/getAllTrackingAnimes', isAuthenticated, getAllTrackingAnime)
 anime.delete('/removeAnime/:name', isAuthenticated, removeAnime)
 
 

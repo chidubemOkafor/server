@@ -1,13 +1,14 @@
 import express, { Request, Response } from "express"
 import { isAuthenticated } from "../middleware/isAuthenticated"
-import { updateProfileImage } from "../controller/profile"
+import { getProfile } from "../controller/profile"
 
 // i need to import multer
 
-const router = express.Router()
+const profile = express.Router()
 
-router.post('/updatePicture',isAuthenticated, (req: Request, res: Response) => updateProfileImage(req, res) )
+// router.post('/updatePicture',isAuthenticated,updateProfileImage)
+profile.get("/profile", isAuthenticated, getProfile)
 
 
-export default router
+export default profile
 //http://localhost:9898/api/v1//verify/UIPK15/6650f8257538a536fe8fb456
