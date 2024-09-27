@@ -1,20 +1,20 @@
 import { Document, Schema, Types } from "mongoose"
+import { IAnimeContent } from "./AnimeArray"
 
 
 interface IBody {
     username: string
     password: string
     email: string,
-    trackingAnimeId?: Types.ObjectId,
 }
 
 interface IUser extends Document {
     _id?: Types.ObjectId,
     username: string,
     profilePicture?: string | null,
-    trackingAnimeId?:Types.ObjectId,
     email: string,
     password: string,
+    trackingAnimes: String[]
     isSubscribed?: boolean,
     createdAt?: Date,
     updatedAt?: Date

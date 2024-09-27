@@ -11,9 +11,6 @@ const userSchema: Schema<IUser> = new Schema({
         type: String, 
         default: null 
     },
-    trackingAnimeId: { 
-        type: Schema.Types.ObjectId, ref: 'UserAnime', required: true,
-    },
     email: { 
         type: String, 
         required: true 
@@ -21,6 +18,10 @@ const userSchema: Schema<IUser> = new Schema({
     password: { 
         type: String, 
         required: true 
+    },
+    trackingAnimes: {
+        type: [String],
+        required: true
     },
     isSubscribed: {
         type: Boolean,  

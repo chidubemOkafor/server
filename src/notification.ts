@@ -2,12 +2,13 @@ import { IAnimeContent } from "./interface/AnimeArray"
 import anime from "./routes/addAnime"
 import { Animecollection } from "./schema/animeSchema"
 import { User, UserAnime } from "./schema/userSchema"
+import { parseDateString } from "./utils/parseDateString"
 
 const shortMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
+const trackingArray: any = []
 // a cron job will run this every 12 o'clock
 const notification = async() => {
-    const trackingArray: any = []
     const date = new Date()
     const day = date.getDate()
     const month = date.getMonth()
@@ -28,9 +29,18 @@ const notification = async() => {
                     }
 
                     if(animeDetail["release_time(sub)"] == "N/A") {
-                        console.log(animeDetail.launch_date)
+                        trackingArray.push(
+                            {
+                                ...parseDateString(animeDetail.launch_date), 
+                                animeName: animeDetail.name,
+                                userId: user[1]._id
+                            })
                     } else {
-                        console.log(animeDetail["release_time(sub)"])
+                        trackingArray.push(
+                            {...parseDateString(animeDetail["release_time(sub)"]), 
+                                animeName: animeDetail.name, 
+                                userId: user[0]._id
+                            })
                     }
                     // console.log(animeDetail["release_time(sub)"])
                     
@@ -38,7 +48,7 @@ const notification = async() => {
                 }
             }
         }
-        // console.log(trackingArray)
+        console.log(trackingArray)
     } catch (error) {
         console.error(error)
     }

@@ -4,38 +4,42 @@ import { IUser } from "../interface/User";
 import { IAnimeContent } from "../interface/AnimeArray";
 import { addTrackingAnime } from "../utils/addTrackingAnime";
 import { Animecollection } from "../schema/animeSchema";
+import { Types } from "mongoose";
+
+// i want to get the name of the anime that is going to be passed (first)
+// if the name is valid then i'll attempt to store it (second)
+// check if the anime is already stored in the tracking anime array (third)
+// if the anime is not stored i'll then store the id of the anime in the tracking anime array (fourth)
 
 async function addAnime(req: Request, res: Response) {
     const  name = req.params.name
     const userDetail = req.user as IUser;
-    let animeCollectionId = userDetail.trackingAnimeId;
 
     try {
-        if (!UserAnime) throw new Error("schema error")
+        const animeArray =  userDetail.trackingAnimes
 
-        let userAnimeCollection = await UserAnime.findById(animeCollectionId);
-
-        if (!userAnimeCollection) {
-
-            const newAnimeCollection = new UserAnime();
-            const savedAnimeCollection = await newAnimeCollection.save();
-
-            const user = await User.findById(userDetail._id);
-
-            if (!user) {
-                return res.status(404).json({ message: "User not found" });
-            }
-
-            user.trackingAnimeId = savedAnimeCollection._id;
-            await user.save();
-            animeCollectionId = savedAnimeCollection._id;
-            userAnimeCollection = savedAnimeCollection;
-
-            addTrackingAnime(userAnimeCollection, res, name as unknown as IAnimeContent)
+        let userAnimeName = await Animecollection.findOne({name});
+        if(!userAnimeName) {
+            return res.status(404).json("name does not exist")
         }
 
-        addTrackingAnime(userAnimeCollection, res, name as unknown as IAnimeContent)
+        const animeExists = animeArray.includes(userAnimeName.name as string)
 
+        if(animeExists) {
+            return res.status(409).json("anime already exists")
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(
+            userDetail._id,
+            { $push: { trackingAnimes: userAnimeName.name } },
+            { new: true }
+        );
+
+        if(updatedUser) {
+            return res.status(200).json({message: "anime added successfully", updatedUser})
+        }
+
+        return res.status(500).json({ message: "Failed to update user information" });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Internal server error" });
@@ -45,24 +49,22 @@ async function addAnime(req: Request, res: Response) {
 async function removeAnime(req: Request, res: Response) {
     const removeName = req.params.name;
     const userDetail = req.user as IUser;
-    console.log(removeName)
     try {
-        const trackingAnimes = await UserAnime.findById(userDetail.trackingAnimeId)
-        if (!trackingAnimes) return res.status(404).json({ message: "no collection for user" })
-        const animeArray = trackingAnimes.trackingAnime
-        console.log(animeArray)
-
-        const index = animeArray?.findIndex(anime => anime.name === removeName)
-        console.log(index)
-
-        if (index === -1 || index === undefined) {
-            return res.status(404).json({ message: "Anime not found in collection" });
+        const animeArray = userDetail.trackingAnimes
+        if (!animeArray.includes(removeName)) {
+            return res.status(404).json({ message: `${removeName} not found in your tracking list` });
         }
 
-        animeArray?.splice(index, 1)
-        await trackingAnimes.save()
+        const updatedUser = await User.findByIdAndUpdate(
+            userDetail._id,
+            { $pull: { trackingAnimes: removeName } },
+            { new: true }
+        );
 
-        return res.status(200).json({ message: `${removeName} has been removed successfully` });
+        if(updatedUser) {
+            return res.status(200).json({message: `${removeName} removed successfully`, updatedUser})
+        }
+        return res.status(500).json({ message: "Failed to update user information" });
     } catch (error) {
         console.error(error)
         res.status(500).json({ message: "Internal server error" })
@@ -72,31 +74,20 @@ async function removeAnime(req: Request, res: Response) {
 async function getAllTrackingAnime(req: Request, res: Response) {
     const userDetail = req.user as IUser;
     try {
-        const trackingAnimes = await UserAnime.findById(userDetail.trackingAnimeId)
+        const validResults = []
+        const animeArray = userDetail.trackingAnimes
 
-        if (!trackingAnimes) return res.status(404).json({ message: "nothing found" }) // this should never return because it is [] default
-
-        // return the anime details
-
-        const animeContentArray = trackingAnimes?.trackingAnime
-
-        if (animeContentArray === undefined) return res.status(404).json({ message: "animeContent is undefined" })
-
-        if (animeContentArray.length === 0) {
+        if (animeArray.length === 0) {
             return res.status(300).json({ message: "No anime to display" });
         }
 
-        const promises = animeContentArray.map(async (item) => {
-            console.log(item.name);
-            const anime = await Animecollection.findOne({ name: item.name });
-            if (anime) {
-                return anime;
-            }
-            return null;
-        });
+        const animePromise = animeArray.map(async (animeName) => {
+            const animeCollection = await Animecollection.findOne({name: animeName})
+            return animeCollection
+        })
 
-        const results = await Promise.all(promises);
-        const validResults = results.filter(anime => anime !== null);
+        const results = await Promise.all(animePromise)
+        validResults.push(...results)
 
         return res.status(200).json({ message: "success", anime: validResults });
 

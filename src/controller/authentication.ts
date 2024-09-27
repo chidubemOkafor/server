@@ -25,6 +25,7 @@ dotenv.config()
                 username,
                 email,
                 password: hashedPassword
+
             }
             
             const token = jwt.sign(user, process.env.SECRET as string)
@@ -73,7 +74,7 @@ dotenv.config()
     async function verify(req: Request, res: Response): Promise<string | Response> {
         const { code } = req.params;
         if ( !code ) {
-            return res.status(401).json({ message: "you need to enter a code" });
+            return res.status(401).json({ message: "you need to enter a code" })
         }
     
         try {
@@ -109,16 +110,12 @@ dotenv.config()
 
             const newUser = user as IBody
             
-            if(!UserAnime || !User) throw new Error("invalid models")
-
-            const newUserAnime = new UserAnime()
-            const userAnime = await newUserAnime.save()
+            if(!User) throw new Error("invalid models")
 
             new User<IBody>({
                 username: newUser.username,
                 email: newUser.email,
-                password: newUser.password,
-                trackingAnimeId: userAnime._id
+                password: newUser.password
             }).save()
 
             return res.status(200).json({ message: "account created successfully" });
@@ -128,8 +125,8 @@ dotenv.config()
         }
     }
 
-      /**
-    * function to create account
+    /**
+    * function to change password
     * @param {Request} req - the request object containing the user detail
     * @param {Response} res - the response object to send to the response
     * @return {Promise<Response | undefined>} - this return a promise
