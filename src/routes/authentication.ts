@@ -14,6 +14,6 @@ auth.post('/changepassword', checkUser, changePassword)
 auth.get('/checkAuth', isAuthenticated, checkAuth)
 auth.post('/verify/:code', verify)
 auth.post('/login', myAuth)
-auth.post('/logout', isAuthenticated, logout)
+auth.post('/logout', logout)
 
 export default auth

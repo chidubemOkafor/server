@@ -179,15 +179,21 @@ dotenv.config()
     * @param {Response} res - the response object to send to the response
     * @return {void} - this return a promise
     */
-    function logout (req: Request, res: Response): void {
-        res.clearCookie('connect.sid'); 
-        req.logout((err) => { 
-            res.status(500).json({ message: "Internal server error", error: err })
+     function logout(req: Request, res: Response): void {
+        res.clearCookie('connect.sid');
+        req.logout((err) => {
+            if (err) {
+                return res.status(500).json({ message: "Internal server error", error: err });
+            }
             req.session.destroy((err) => {
-                res.status(200).json({message: "logged out"})
+                if (err) {
+                    return res.status(500).json({ message: "Internal server error", error: err });
+                }
+                return res.status(200).json({ message: "Logged out" });
             });
         });
     }
+    
 
     export {
         createAccount,
