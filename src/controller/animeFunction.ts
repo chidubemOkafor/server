@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import { User, UserAnime } from "../schema/userSchema";
 import { IUser } from "../interface/User";
 import { IAnimeContent } from "../interface/AnimeArray";
-import { addTrackingAnime } from "../utils/addTrackingAnime";
 import { Animecollection } from "../schema/animeSchema";
 import { Types } from "mongoose";
 
@@ -79,19 +78,18 @@ async function getAllTrackingAnime(req: Request, res: Response) {
         const animeArray = userDetail.trackingAnimes
 
         if (animeArray.length === 0) {
-            res.set('Cache-Control', 'no-store');
             return res.status(404).json({ message: "No anime to displays" });
         }
 
         const animePromise = animeArray.map(async (animeName) => {
             const animeCollection = await Animecollection.findOne({name: animeName})
+
             return animeCollection
         })
 
         const results = await Promise.all(animePromise)
         validResults.push(...results)
 
-        res.set('Cache-Control', 'no-store');
         return res.status(200).json({ message: "success", anime: validResults });
 
     } catch (error) {
