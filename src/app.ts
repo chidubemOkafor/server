@@ -19,7 +19,7 @@ const PORT = process.env.PORT || 8000
 const app = express()
 
 app.use(cors({
-    origin: 'http://localhost:5173', // Replace with your frontend's origin
+    origin: process.env.NODE_ENV === 'development' ? 'http://localhost:5173' : '', // Replace with your frontend's origin
     credentials: true
   }));
 
