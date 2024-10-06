@@ -9,7 +9,7 @@ export async function generateVerificationCodeAndSaveToDatabase (_to: string, _e
 
     await Token.deleteMany({email: _to})
 
-    const storeToken: IToken = new Token({
+    const storeToken = new Token({
         token: generateOTP(),
         encryptedToken: _encriptedToken,
         email: _to,
